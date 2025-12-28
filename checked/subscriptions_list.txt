@@ -1,0 +1,8 @@
+=== 🇷🇺 RUSSIA SUBSCRIPTIONS ===
+⭐️ Elite (Reality/SS Fast): https://raw.githubusercontent.com/kort0881/vpn-checker-backend/main/checked/RU_Best/ru_elite.txt
+   Elite Part 2: https://raw.githubusercontent.com/kort0881/vpn-checker-backend/main/checked/RU_Best/ru_elite_part2.txt
+✅ Normal (Reserve): https://raw.githubusercontent.com/kort0881/vpn-checker-backend/main/checked/RU_Best/ru_normal.txt
+
+=== 🌍 WORLD SUBSCRIPTIONS ===
+⚡️ Fast Mix: https://raw.githubusercontent.com/kort0881/vpn-checker-backend/main/checked/World_Mix/world_fast.txt
+🐢 Slow/Reserve: https://raw.githubusercontent.com/kort0881/vpn-checker-backend/main/checked/World_Mix/world_slow.txt
