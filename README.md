@@ -1,6 +1,6 @@
 # 🛡 VPN Checker & Aggregator (Raw/Beta Version)
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/YOUR_REPO/run_check.yml?label=Auto-Check&style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/IvanovTony/vpn-checker-script/run_check.yml?label=Auto-Check&style=for-the-badge)
 
 **ПРЕДУПРЕЖДЕНИЕ:** Это ранняя (сырая) версия скрипта. Возможны ошибки при плохом соединении с GitHub и ложные срабатывания при проверке.
 
