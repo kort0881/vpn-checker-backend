@@ -1,1 +1,0 @@
-vless://64bc8910-bc0f-453e-b3f3-a101a5dce03e@217.12.40.76:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=sun9-38.userapi.com&fp=chrome&pbk=FkmYFobwxLMLEktYXywmjthuEYCZggITsxwPNasTKUg&sid=43df3983229a1c73&type=tcp&headerType=none#5541ms_IT_@vlesstrojan
