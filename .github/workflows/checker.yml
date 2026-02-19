@@ -1,36 +1,35 @@
-name: Auto Key Checker
+name: VPN Checker
 
 on:
   schedule:
-    - cron: '0 */4 * * *'  # Каждые 4 часа
-  workflow_dispatch:       # Кнопка запуска
-
-permissions:
-  contents: write
+    - cron: '0 */4 * * *'   # каждые 4 часа
+  workflow_dispatch:          # возможность ручного запуска
 
 jobs:
-  check-keys:
+  check:
     runs-on: ubuntu-latest
-    timeout-minutes: 350   # Лимит 6 часов, чтобы не отрубило раньше
-    
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install requests aiohttp beautifulsoup4 websocket-client
 
-      - name: Run Checker Script
+      - name: Run checker
         run: python main.py
 
-      - name: Commit & Push Results
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "Auto-update checked keys"
-          file_pattern: "checked/*"
+      - name: Commit and push if changes
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add checked/
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update checked keys"
+          git push
