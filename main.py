@@ -55,7 +55,9 @@ EURO_FILES = ["my_euro_part1.txt", "my_euro_part2.txt", "my_euro_part3.txt"]
 HISTORY_FILE = os.path.join(BASE_DIR, "history.json")
 MY_CHANNEL = "@vlesstrojan"
 
+# ==================== ОБНОВЛЁННЫЙ СПИСОК URLS_RU ====================
 URLS_RU = [
+    # старые источники (сохраняем все, что были)
     "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Base64/BLACK_SS+All_RUS_base64.txt",
     "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Base64/BLACK_VLESS_RUS_base64.txt",
     "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Base64/BLACK_VLESS_RUS_mobile_base64.txt",
@@ -119,9 +121,46 @@ URLS_RU = [
     "https://raw.githubusercontent.com/nzea243/ikoV31tud_vpn/refs/heads/main/tri_228.txt",
     "https://raw.githubusercontent.com/mbelspb-gif/gdffgd/refs/heads/main/Swordware.net",
     "https://gist.githubusercontent.com/flaafix/c79a81037d15163360571c7a7331b153/raw/AetrisVPN.txt",
-    "https://raw.githubusercontent.com/HalyavusVPNUS/halyava-vpn-lte/refs/heads/main/lte.txt"
+    "https://raw.githubusercontent.com/HalyavusVPNUS/halyava-vpn-lte/refs/heads/main/lte.txt",
+
+    # ---------- НОВЫЕ ИСТОЧНИКИ (добавлены 09.07.2026) ----------
+    "https://tinyurl.com/freesub-scalavpnrobot",
+    "https://raw.githubusercontent.com/Ilyacom4ik/free-v2ray-2026/refs/heads/main/subscriptions/FreeCFGHub1.txt",
+    "https://raw.githubusercontent.com/uretkavpn/Uretkavpn/refs/heads/main/UretkaVpn.txt",
+    "https://gist.githubusercontent.com/FrizanGAME/dfd1f7ac36511593dc6d0faff14cc8bb/raw/frizanVPN.txt",
+    "https://raw.githubusercontent.com/Ilyacom4ik/vpn-keys/refs/heads/main/allkeysFreeCFGHub.txt",
+    "https://raw.githubusercontent.com/likzil/vless1/refs/heads/main/Treetcpvpn",
+    "https://raw.githubusercontent.com/Ilyacom4ik/vpn-keys/refs/heads/main/FreeCFGHubSUB",
+    "https://raw.githubusercontent.com/RKPchannel/RKP_bypass_configs/refs/heads/main/whitelist.txt",
+    "https://tinyurl.com/AeryxWiFiLTE",
+    "https://tinyurl.com/5cnvrkmy",
+    "https://tinyurl.com/3mzxa6k6",
+    "https://tinyurl.com/Sub1EggAeryx",
+    "https://raw.githubusercontent.com/Ghost-LInk-star/GhostL/refs/heads/main/dizzga.txt",
+    "https://raw.githubusercontent.com/mbelspb-gif/bright/refs/heads/main/Kdlddl.sw",
+    "https://raw.githubusercontent.com/Ghost-LInk-star/bambuk/refs/heads/main/vpn.txt",
+    "https://gist.githubusercontent.com/nikitavalentinov90021-ai/b5f135a9547a559f8042cfc7c7cde32d/raw/3d454f959d5f4a2c37c47a5d4d9bd4c798506cea/LTE8464552823",
+    "https://gist.githubusercontent.com/pidarasuebisov-afk/e220b44264242d1a97c0908aba091edd/raw/PKN%20cocnyL",
+    "https://raw.githubusercontent.com/dmitriistekolnikov/Free_vpns_for_Russ/refs/heads/main/Vpn.txt",
+    "https://gist.githubusercontent.com/nikitavalentinov90021-ai/a4de8e24121096a7714be35465849a0c/raw/995e0ee28983e89e3dab94d9e80834514bd212c1/ID6592823693.txt",
+    "https://gist.githubusercontent.com/nikitavalentinov90021-ai/41901f30db6c78a6a4d0da27429f4fab/raw/6efae398be2ad0ab70ba257bab20a82053c36383/LTE.txt",
+    "https://gist.githubusercontent.com/VSPBOOST/d84dcf89bf31012a96ee60a9eb73b852/raw/4f6af123b4a0251806b89958c845666268283c5a/gistfile1.txt",
+    "https://gitverse.ru/api/repos/cid-uskoritel/cid-white/raw/branch/master/whitelist(beta).txt",
+    "https://raw.githubusercontent.com/ByeWhiteLists/ByeWhiteLists2/refs/heads/main/ByeWhiteLists2.txt",
+    "https://raw.githubusercontent.com/RYZgames31/UWB/refs/heads/main/wcfg",
+    "https://raw.githubusercontent.com/twinkalex1470-crypto/CatWhiteVPN/refs/heads/main/CaTWhiteVPN.txt",
+    "https://raw.githubusercontent.com/DarkFirexs/Whitelist-bypass_VPN/refs/heads/main/Whitelist%20%7C%20VPN",
+    "https://raw.githubusercontent.com/stanislavPLS/AuraChannel/refs/heads/main/ID%3D1%2Cdata%3D280427",
+    "https://raw.githubusercontent.com/stanislavPLS/GMVPN-users/refs/heads/main/id%3D1%2Cdata%3D120527",
+    "https://gitverse.ru/api/repos/cid-uskoritel/cid-white/raw/branch/master/whitelist.txt",
+    "https://sub.obbhod.online/premium",
+    "http://194.33.61.236:8080/premium",
+    "https://raw.githubusercontent.com/Ilyacom4ik/free-v2ray-2026/refs/heads/main/subscriptions/whitelist-keys.txt",
+    "http://144.31.165.198:8080/premium",
+    "https://raw.githubusercontent.com/kama55726/KomaryServers/main/White-List-2"
 ]
 
+# ==================== ОСТАЛЬНЫЕ URLS_MY (без изменений) ====================
 URLS_MY = [
     "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/main/archive/subscriptions/all_base64.txt",
     "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/main/archive/subscriptions/all.txt",
@@ -563,7 +602,6 @@ def generate_subscriptions_list(ru_fast_files, ru_all_files, euro_fast_files, eu
     BASE_RAW = f"https://raw.githubusercontent.com/{GITHUB_USER_REPO}/{BRANCH}"
     subs_lines = []
 
-    # Добавляем временную метку, чтобы файл всегда обновлялся
     subs_lines.append(f"# Generated: {datetime.now(timezone.utc).isoformat()} UTC")
     subs_lines.append("")
 
