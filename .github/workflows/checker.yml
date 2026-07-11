@@ -2,8 +2,8 @@ name: Auto Key Checker
 
 on:
   schedule:
-    - cron: '0 */4 * * *'
-  workflow_dispatch:
+    - cron: '0 */4 * * *'          # каждые 4 часа (в 00:00, 04:00, 08:00, 12:00, 16:00, 20:00 UTC)
+  workflow_dispatch:               # ручной запуск
 
 permissions:
   contents: write
@@ -55,8 +55,30 @@ jobs:
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
+
+          # Добавляем все изменённые файлы (игнорируем ошибки, если файлов нет)
           git add checked/subscriptions_list.txt || true
           git add checked/**/*.txt || true
           git add checked/**/*.json || true
-          git commit -m "🤖 Auto-update checked keys [${{ github.run_id }}]" || echo "No changes to commit"
+
+          # Проверяем, есть ли изменения для коммита
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          # Создаём коммит
+          git commit -m "🤖 Auto-update checked keys [${{ github.run_id }}]"
+
+          # Синхронизируемся с удалённой веткой: забираем последние изменения
+          # и перебазируем наш коммит поверх них.
+          # При конфликте в файлах checked/ оставляем наши версии (-X ours)
+          git pull --rebase -X ours origin main || {
+            echo "Rebase failed, aborting and using force push as fallback"
+            git rebase --abort
+            git push --force origin main
+            exit 0
+          }
+
+          # Безопасный push (проверяет, что удалённая ветка не изменилась с момента последнего pull)
           git push --force-with-lease origin main
