@@ -72,8 +72,9 @@ jobs:
 
           # Синхронизируемся с удалённой веткой: забираем последние изменения
           # и перебазируем наш коммит поверх них.
-          # При конфликте в файлах checked/ оставляем наши версии (-X ours)
-          git pull --rebase -X ours origin main || {
+          # --autostash сохраняет незакоммиченные изменения, если они есть,
+          # а -X ours автоматически разрешает конфликты в пользу наших файлов.
+          git pull --rebase --autostash -X ours origin main || {
             echo "Rebase failed, aborting and using force push as fallback"
             git rebase --abort
             git push --force origin main
