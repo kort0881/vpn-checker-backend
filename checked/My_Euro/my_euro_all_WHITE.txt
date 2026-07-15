@@ -1,6 +1,0 @@
-vless://e4824193-4f54-453b-d037-88368e85ef0e@104.17.239.248:443?encryption=none&security=tls&sni=pqh30v4.hiddendom.shop&alpn=h2&type=grpc#[31ms CA CA  @vlesstrojan]
-vless://e4824193-4f54-453b-d037-88368e85ef0e@104.16.9.20:443?encryption=none&security=tls&sni=pqh27v5.hiddendom.shop&alpn=h2&type=grpc#[35ms CA CA  @vlesstrojan]
-vless://e4824193-4f54-453b-d037-88368e85ef0e@all.tellmethetrue.shop:443?encryption=none&security=tls&sni=pqh30v1.hiddendom.shop&alpn=h2&type=grpc#[121ms US US  @vlesstrojan]
-vless://0ea84d1f-2687-467d-97dd-ed8d5e8f3f42@64.188.115.219:443?security=reality&type=tcp&sni=web.max.ru&fp=chrome&flow=xtls-rprx-vision&sid=1c&pbk=lH-huUA9Ek_XYglIopgfGL3lJ-qn8rXK8iG1tlXrxls&encryption=none#[418ms Германия DE 🇩🇪 @vlesstrojan]
-vless://9e20b04d-5a81-4e16-b421-01e502f0aac6@57.129.132.223:80?encryption=none&security=none&type=ws&host=google.com&path=%2Fvless%2F#[433ms Великобритания GB 🇬🇧 @vlesstrojan]
-vless://18805ff3-b420-45de-af18-93be14024ae8@47.251.25.74:443?security=reality&type=tcp&sni=www.amazon.com&fp=chrome&flow=xtls-rprx-vision&pbk=H56cOJhw0xw76lDEpt7IuJJmVGemK6_CK34KtHwDMX8&encryption=none#[1701ms US US  @vlesstrojan]
