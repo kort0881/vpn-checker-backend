@@ -161,11 +161,11 @@ URLS_RU = [
 ]
 
 # ==================== ОСТАЛЬНЫЕ URLS_MY (без изменений) ====================
+# ==================== НОВЫЕ URLS_MY (свежие источники) ====================
 URLS_MY = [
-    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/main/archive/subscriptions/all_base64.txt",
-    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/main/archive/subscriptions/all.txt",
-    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/main/archive/subscriptions/sni_filtered_base64.txt",
-    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/main/archive/my_sources/generated/vless.txt",
+    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/refs/heads/main/data/githubmirror/new/all_new.txt",
+    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/refs/heads/main/data/githubmirror/new/cf_fresh.txt",
+    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/refs/heads/main/data/githubmirror/clean/vless.txt",
 ]
 
 EURO_CODES = {
