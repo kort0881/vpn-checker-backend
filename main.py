@@ -35,7 +35,7 @@ THREADS = 40
 CACHE_HOURS = 6
 CHUNK_LIMIT = 1000
 EURO_CHUNK_LIMIT = 500
-MAX_KEYS_TO_CHECK = 30000
+MAX_KEYS_TO_CHECK = 100000  # УВЕЛИЧЕНО
 
 MAX_PING_MS = 10000
 FAST_LIMIT = 3000
@@ -160,15 +160,26 @@ URLS_RU = [
     "https://raw.githubusercontent.com/kama55726/KomaryServers/main/White-List-2"
 ]
 
-# ==================== ОСТАЛЬНЫЕ URLS_MY (без изменений) ====================
-# ==================== НОВЫЕ URLS_MY (свежие источники) ====================
+# ==================== КОМБИНИРОВАННЫЙ URLS_MY (старые + clean) ====================
 URLS_MY = [
-    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/refs/heads/main/data/githubmirror/clean/hy2.txt",
+    # ---------- СТАРЫЕ ИСТОЧНИКИ (ДАВАЛИ ЕВРОПУ 18.07) ----------
+    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/main/archive/subscriptions/all_base64.txt",
+    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/main/archive/subscriptions/all.txt",
+    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/main/archive/subscriptions/sni_filtered_base64.txt",
+    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/main/archive/my_sources/generated/vless.txt",
+
+    # ---------- НОВЫЕ CLEAN-ФАЙЛЫ ----------
     "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/refs/heads/main/data/githubmirror/clean/vless.txt",
+    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/refs/heads/main/data/githubmirror/clean/hy2.txt",
     "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/refs/heads/main/data/githubmirror/clean/hysteria2.txt",
     "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/refs/heads/main/data/githubmirror/clean/ss.txt",
     "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/refs/heads/main/data/githubmirror/clean/trojan.txt",
+
+    # ---------- ОПЦИОНАЛЬНО: all_new.txt и cf_fresh.txt ----------
+    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/refs/heads/main/data/githubmirror/new/all_new.txt",
+    "https://raw.githubusercontent.com/kort0881/vpn-vless-configs-russia/refs/heads/main/data/githubmirror/new/cf_fresh.txt",
 ]
+
 EURO_CODES = {
     "NL", "DE", "FI", "GB", "FR", "SE", "PL", "CZ", "AT", "CH",
     "IT", "ES", "NO", "DK", "BE", "IE", "LU", "EE", "LV", "LT"
@@ -408,9 +419,11 @@ def fetch_keys(urls, tag):
                 l = l.strip()
                 if len(l) > 2000:
                     continue
-                if l.startswith(("vless://", "vmess://", "trojan://", "ss://")):
-                    if tag == "MY" and is_garbage_text(l):
-                        continue
+                # ДОБАВЛЕНЫ ПРОТОКОЛЫ hy2:// и hysteria2://
+                if l.startswith(("vless://", "vmess://", "trojan://", "ss://", "hy2://", "hysteria2://")):
+                    # ВРЕМЕННО ОТКЛЮЧАЕМ ФИЛЬТР ДЛЯ MY (для отладки)
+                    # if tag == "MY" and is_garbage_text(l):
+                    #     continue
                     out.append((l, tag))
         except Exception:
             pass
@@ -708,6 +721,11 @@ if __name__ == "__main__":
     history = load_json(HISTORY_FILE)
     tasks = fetch_keys(URLS_RU, "RU") + fetch_keys(URLS_MY, "MY")
 
+    # ОТЛАДОЧНЫЙ ВЫВОД
+    ru_count = sum(1 for _, tag in tasks if tag == "RU")
+    my_count = sum(1 for _, tag in tasks if tag == "MY")
+    print(f"📥 Загружено RU: {ru_count}, MY: {my_count}")
+
     unique_tasks = {k: tag for k, tag in tasks}
     all_items = list(unique_tasks.items())
     if len(all_items) > MAX_KEYS_TO_CHECK:
@@ -880,7 +898,6 @@ if __name__ == "__main__":
         print(f"  {kind:8s}: {n:5d}  ({n * 100 // total_err}%)")
 
     print("\n✅ SUCCESS: FAST/ALL + WHITE/BLACK GENERATED")
-
 
 
 
