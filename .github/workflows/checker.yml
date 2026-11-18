@@ -16,7 +16,7 @@ concurrency:
 jobs:
   check-keys:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 240
 
     steps:
       - name: Checkout Code
@@ -40,11 +40,33 @@ jobs:
           unzip -o xray.zip
           chmod +x xray
 
+      - name: Download sing-box (optional, для hy2/tuic)
+        continue-on-error: true
+        run: |
+          SB_VER=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest \
+            | grep -oP '"tag_name": *"v\K[^"]+')
+          echo "sing-box version: $SB_VER"
+          curl -L "https://github.com/SagerNet/sing-box/releases/download/v${SB_VER}/sing-box-${SB_VER}-linux-amd64.tar.gz" -o sb.tar.gz
+          tar -xzf sb.tar.gz
+          cp sing-box-*/sing-box ./sing-box
+          chmod +x ./sing-box
+          ./sing-box version || true
+
       - name: Run Checker
         run: python main.py
-        timeout-minutes: 340
+        timeout-minutes: 220
         env:
           PYTHONUNBUFFERED: 1
+
+      - name: White/Black stats
+        if: always()
+        run: |
+          for f in checked/RU_Best/ru_white_all_WHITE.txt checked/RU_Best/ru_white_all_BLACK.txt \
+                   checked/My_Euro/my_euro_all_WHITE.txt checked/My_Euro/my_euro_all_BLACK.txt; do
+            if [ -f "$f" ]; then echo "$f: $(grep -c . "$f" || true) строк"; fi
+          done
+          echo "unverified (RU ALL): $(grep -h -c '\[unverified\]' checked/RU_Best/ru_white_all_part*.txt 2>/dev/null | paste -sd+ | bc 2>/dev/null || echo n/a)"
+          echo "unsupported_proto: $(grep -h -c '\[unsupported_proto\]' checked/RU_Best/ru_white_all_part*.txt 2>/dev/null | paste -sd+ | bc 2>/dev/null || echo n/a)"
 
       - name: Remove null bytes from checked files
         run: |

@@ -1,3 +1,5 @@
-requests
+requests[socks]
+pyyaml
+maxminddb
+geoip2
 websocket-client
-

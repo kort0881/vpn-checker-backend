@@ -16,6 +16,8 @@ from urllib.parse import unquote
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import defaultdict
 
+from white_checker import batch_white_check, reason_summary, singbox_available, xray_available
+
 # ------------------ Настройки ------------------
 BASE_DIR = "checked"
 FOLDER_RU = os.path.join(BASE_DIR, "RU_Best")
@@ -185,6 +187,13 @@ EURO_CODES = {
     "IT", "ES", "NO", "DK", "BE", "IE", "LU", "EE", "LV", "LT"
 }
 BAD_MARKERS = ["CN", "IR", "KR", "BR", "IN", "RELAY", "POOL", "🇨🇳", "🇮🇷", "🇰🇷"]
+# разделённые списки маркеров для is_garbage_text
+BAD_WORD_MARKERS = [
+    "🇨🇳", "🇮🇷", "🇰🇷", "🇧🇷", "🇮🇳",
+    "CHINA", "IRAN", "KOREA", "BRAZIL", "INDIA",
+    "RELAY", "POOL",
+]
+BAD_CODE_MARKERS = ["CN", "IR", "KR", "BR"]  # 'IN' убран: ловит английское 'in-' в подписях
 
 RU_MARKERS_STRICT = [
     ".ru", "moscow", "msk", "spb", "saint-peter", "russia",
@@ -389,12 +398,20 @@ def is_russian_exit(key_str: str, host: str, country: str) -> bool:
     return False
 
 def is_garbage_text(key_str: str) -> bool:
-    upper = key_str.upper()
-    for m in BAD_MARKERS:
-        if m in upper:
+    """Мусор определяем ТОЛЬКО по комментарию (#...), не по хосту.
+
+    Хост может быть рабочим, а в подписи стоять 🇨🇳/IR_/CN_ — такие ключи и
+    надо выбрасывать. Двухбуквенные коды ищем как отдельный токен, иначе
+    «FINLAND»/«BERLIN» ловятся на подстроку IN.
+    """
+    comment = key_str.split("#", 1)[1] if "#" in key_str else ""
+    upper = comment.upper()
+    for marker in BAD_WORD_MARKERS:
+        if marker in upper:
             return True
-    if ".ir" in key_str or ".cn" in key_str or "127.0.0.1" in key_str:
-        return True
+    for code in BAD_CODE_MARKERS:
+        if re.search(rf"(?<![A-Z]){code}(?![A-Z])", upper):
+            return True
     return False
 
 def fetch_keys(urls, tag):
@@ -420,11 +437,11 @@ def fetch_keys(urls, tag):
                 if len(l) > 2000:
                     continue
                 # ДОБАВЛЕНЫ ПРОТОКОЛЫ hy2:// и hysteria2://
-                if l.startswith(("vless://", "vmess://", "trojan://", "ss://", "hy2://", "hysteria2://")):
-                    # ВРЕМЕННО ОТКЛЮЧАЕМ ФИЛЬТР ДЛЯ MY (для отладки)
-                    # if tag == "MY" and is_garbage_text(l):
-                    #     continue
-                    out.append((l, tag))
+                if l.startswith(("vless://", "vmess://", "trojan://", "ss://", "hy2://", "hysteria2://", "tuic://")):
+                    # фильтр мусора для MY — только по комментарию
+                    if tag == "MY" and is_garbage_text(l):
+                        continue
+                    out.append((fix_universal(l), tag))
         except Exception:
             pass
     return out
@@ -530,7 +547,7 @@ def make_final_key(k_id, latency, country):
     title_full = f"{title_ru} {country}" if country and country != "UNKNOWN" else title_ru
     info_str = f"[{latency}ms {title_full} {flag} {MY_CHANNEL}]"
     raw = f"{k_id}#{info_str}"
-    return fix_universal(raw)
+    return raw
 
 def extract_ping(key_str):
     try:
@@ -545,7 +562,7 @@ def extract_ping(key_str):
 def save_exact(keys, folder, filename):
     path = os.path.join(folder, filename)
     with open(path, "w", encoding="utf-8") as f:
-        cleaned = [fix_universal(k.strip()) for k in keys if k and k.strip()]
+        cleaned = [k.strip() for k in keys if k and k.strip()]
         f.write("\n".join(cleaned))
     return path
 
@@ -820,6 +837,42 @@ if __name__ == "__main__":
     print(f"  RU: {len(res_ru_clean)} ключей")
     print(f"  EURO: {len(res_euro_clean)} ключей")
 
+    # ---------- РЕАЛЬНАЯ ПРОВЕРКА ЧЕРЕЗ XRAY/SING-BOX ----------
+    # Проверяем не «открыт ли TCP», а «открываются ли нужные сайты».
+    # Глубокая проверка дорогая, поэтому только топ-300 по задержке:
+    # остальные остаются в ALL с пометкой [unverified].
+    WHITE_TOP_N = 300
+    ru_top = res_ru_clean[:WHITE_TOP_N]
+    euro_top = res_euro_clean[:WHITE_TOP_N]
+
+    print(f"\n🔬 Белый чек через xray/sing-box: RU топ-{len(ru_top)}, EURO топ-{len(euro_top)}")
+    ru_white, ru_black, ru_unknown = batch_white_check(ru_top, history, workers=5, label="RU")
+    euro_white, euro_black, euro_unknown = batch_white_check(
+        euro_top, history, workers=5, label="EURO"
+    )
+
+    def status_map(white, black, unknown, top):
+        st = {k.split("#")[0]: "unverified" for k in top}
+        for k in white:
+            st[k.split("#")[0]] = "white"
+        for k in black:
+            st[k.split("#")[0]] = "black"
+        for k in unknown:
+            st[k.split("#")[0]] = "unsupported_proto"
+        return st
+
+    def annotate(keys, st):
+        out = []
+        for k in keys:
+            s = st.get(k.split("#")[0], "unverified")
+            out.append(k if s == "white" else f"{k} [{s}]")
+        return out
+
+    ru_status = status_map(ru_white, ru_black, ru_unknown, ru_top)
+    euro_status = status_map(euro_white, euro_black, euro_unknown, euro_top)
+    res_ru_all = annotate(res_ru_clean, ru_status)
+    res_euro_all = annotate(res_euro_clean, euro_status)
+
     res_ru_fast = res_ru_clean[:FAST_LIMIT]
     res_euro_fast = res_euro_clean[:FAST_LIMIT]
 
@@ -834,18 +887,18 @@ if __name__ == "__main__":
     euro_fast_files = save_fixed_chunks_euro(res_euro_fast, FOLDER_EURO)
 
     print(f"\n💾 Сохранение RU ALL → {FOLDER_RU}:")
-    ru_all_files = save_chunked(res_ru_clean, FOLDER_RU, "ru_white_all")
+    ru_all_files = save_chunked(res_ru_all, FOLDER_RU, "ru_white_all")
 
     print(f"\n💾 Сохранение EURO ALL → {FOLDER_EURO} (по {EURO_CHUNK_LIMIT} ключей):")
-    euro_all_files = save_chunked(res_euro_clean, FOLDER_EURO, "my_euro_all", chunk_size=EURO_CHUNK_LIMIT)
+    euro_all_files = save_chunked(res_euro_all, FOLDER_EURO, "my_euro_all", chunk_size=EURO_CHUNK_LIMIT)
 
     print(f"\n💾 WHITE/BLACK → {FOLDER_RU}:")
-    save_exact(res_ru_clean, FOLDER_RU, "ru_white_all_WHITE.txt")
-    save_exact(dead_ru, FOLDER_RU, "ru_white_all_BLACK.txt")
+    save_exact(ru_white, FOLDER_RU, "ru_white_all_WHITE.txt")
+    save_exact(ru_black, FOLDER_RU, "ru_white_all_BLACK.txt")
 
     print(f"\n💾 WHITE/BLACK → {FOLDER_EURO}:")
-    save_exact(res_euro_clean, FOLDER_EURO, "my_euro_all_WHITE.txt")
-    save_exact(dead_euro, FOLDER_EURO, "my_euro_all_BLACK.txt")
+    save_exact(euro_white, FOLDER_EURO, "my_euro_all_WHITE.txt")
+    save_exact(euro_black, FOLDER_EURO, "my_euro_all_BLACK.txt")
 
     # Принудительная генерация subscriptions_list.txt с диагностикой
     try:
@@ -875,9 +928,35 @@ if __name__ == "__main__":
     print("=" * 55)
 
     print(f"\n✅ Результат:")
-    print(f"  RU FAST: {len(res_ru_fast)}, RU WHITE: {len(res_ru_clean)}, RU BLACK: {len(dead_ru)}")
-    print(f"  EURO FAST: {len(res_euro_fast)}, EURO WHITE: {len(res_euro_clean)}, EURO BLACK: {len(dead_euro)}")
+    print(f"  RU FAST: {len(res_ru_fast)}, RU WHITE: {len(ru_white)}, RU BLACK: {len(ru_black)}, RU UNKNOWN: {len(ru_unknown)}")
+    print(f"  ALL: RU {len(res_ru_all)}, EURO {len(res_euro_all)} (вне топ-{WHITE_TOP_N} помечены [unverified])")
     print(f"  EURO ключей отфильтровано как RU-exit: {euro_filtered_ru}")
+    print(f"  EURO FAST: {len(res_euro_fast)}, EURO WHITE: {len(euro_white)}, EURO BLACK: {len(euro_black)}, EURO UNKNOWN: {len(euro_unknown)}")
+
+    print(f"\n🧰 Движки: xray={'есть' if xray_available() else 'НЕТ'}, "
+          f"sing-box={'есть' if singbox_available() else 'НЕТ'}")
+    print(f"\n✅ WHITE (реально проверено через Xray/sing-box):")
+    print(f"  RU:    {len(ru_white)} (из {len(ru_top)} топ-{WHITE_TOP_N})")
+    print(f"  EURO:  {len(euro_white)} (из {len(euro_top)} топ-{WHITE_TOP_N})")
+    print(f"\n🟡 UNKNOWN (протокол не поддержан / нет бинаря):")
+    print(f"  RU:    {len(ru_unknown)}")
+    print(f"  EURO:  {len(euro_unknown)}")
+    print(f"  не проверялись (вне топ-{WHITE_TOP_N}, [unverified]): "
+          f"RU {max(0, len(res_ru_clean) - len(ru_top))}, "
+          f"EURO {max(0, len(res_euro_clean) - len(euro_top))}")
+
+    reasons = {}
+    for _label, counter in reason_summary().items():
+        for reason, n in counter.items():
+            if reason in ("cached_white", "cached_black", "white", ""):
+                continue
+            reasons[reason] = reasons.get(reason, 0) + n
+    print(f"\n⛔ Причины BLACK (топ-5):")
+    if reasons:
+        for reason, n in sorted(reasons.items(), key=lambda x: -x[1])[:5]:
+            print(f"  {reason}: {n}")
+    else:
+        print("  (нет данных)")
 
     print(f"\n🌍 Источник страны (geo-статистика):")
     with _geo_stats_lock:
