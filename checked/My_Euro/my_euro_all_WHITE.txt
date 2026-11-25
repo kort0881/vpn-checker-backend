@@ -1,2 +1,4 @@
-ss://YWVzLTI1Ni1nY206ekROVmVkUkZQUWV4Rzl2@51.222.12.127:445#[73ms Испания ES 🇪🇸 @vlesstrojan]
-ss://YWVzLTI1Ni1nY206ekROVmVkUkZQUWV4Rzl2@51.222.141.125:445#[73ms Испания ES 🇪🇸 @vlesstrojan]
+ss://YWVzLTI1Ni1nY206ekROVmVkUkZQUWV4Rzl2@51.222.141.125:445#[76ms CA CA  @vlesstrojan]
+ss://YWVzLTI1Ni1nY206ekROVmVkUkZQUWV4Rzl2@51.222.12.127:445#[77ms CA CA  @vlesstrojan]
+ss://YWVzLTEyOC1nY206c2hhZG93c29ja3M@149.22.87.204:443#[110ms JP JP  @vlesstrojan]
+hy2://usqmqUKJFIlCmvkCNSY64L3k@8.209.247.109:443?insecure=1#[111ms JP JP  @vlesstrojan]
